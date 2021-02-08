@@ -1,4 +1,5 @@
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -8,10 +9,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '+_kfhc&4j0r381=v9bz29q*-#s2gqplayy56f)qr*^cwr7t#lx'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG',cast=bool)
 
 ALLOWED_HOSTS = []
 
@@ -122,6 +123,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 
-JWT_SECRET_KEY = '67asd6agdysuasd'
+JWT_SECRET_KEY = config('JWT_SECRET_KEY')
 
 

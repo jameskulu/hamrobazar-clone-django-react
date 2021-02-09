@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 
 @api_view(['GET', ])
 @permission_classes((IsAuthenticated,))
-def products(request):
+def api_products_view(request):
   try:
       posts = Product.objects.all()
   except Product.DoesNotExist:
@@ -21,7 +21,7 @@ def products(request):
 
 @api_view(['POST',])
 @permission_classes((IsAuthenticated,))
-def add_product(request):
+def api_add_product_view(request):
   user = request.user
   product = Product(user=user)
   if request.method == 'POST':
@@ -33,9 +33,31 @@ def add_product(request):
       return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
 
+@api_view(['PUT', ])
+@permission_classes((IsAuthenticated,))
+def api_update_product_view(request, pk):
+    try:
+        post = Product.objects.get(pk=pk)
+    except Product.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    user = request.user
+
+    if post.user.user != user:
+        return Response({'response': 'You dont have permission to edit this product.'})
+    if request.method == 'PUT':
+        serializer = ProductSerializer(post, data=request.data)
+        data = {}
+        if serializer.is_valid():
+            serializer.save()
+            data['success'] = 'update successfully'
+            return Response(data=data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['DELETE', ])
 @permission_classes((IsAuthenticated,))
-def api_delete_post_view(request, pk):
+def api_delete_product_view(request, pk):
     try:
         post = Product.objects.get(pk=pk)
     except Product.DoesNotExist:
@@ -52,3 +74,4 @@ def api_delete_post_view(request, pk):
         else:
             data['failure'] = 'Delete failed'
         return Response(data=data)
+

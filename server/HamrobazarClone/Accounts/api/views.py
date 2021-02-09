@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from django.contrib import auth
 from django.conf import settings
 from django.http import JsonResponse
@@ -11,6 +10,7 @@ from rest_framework.generics import GenericAPIView
 
 import jwt
 from Accounts.api.serializer import  LoginSerializer,RegistrationSerializer
+from ..models import Account
 
 
 @api_view(['POST', ])
@@ -20,10 +20,11 @@ def api_register_user_view(request):
         data = {}
         if serializer.is_valid():
             account = serializer.save()
+            data['success'] = True
             data['user_id'] = account.id
             data['email'] = account.email
-            data['username'] = account.username
         else:
+            data['success'] = False
             data['details'] = serializer.errors
         return Response(data)
 
@@ -32,19 +33,22 @@ class LoginView(GenericAPIView):
     serializer_class = LoginSerializer
 
     def post(self, request):
-        data = request.data
-        username = data.get('username', '')
-        password = data.get('password', '')
-        user = auth.authenticate(username=username, password=password)
+        email = request.data.get('email', '')
+        password = request.data.get('password', '')
+        user = auth.authenticate(email=email, password=password)
 
         if user:
             auth_token = jwt.encode(
-                {'username': user.username}, settings.JWT_SECRET_KEY)
+                {'id': user.id}, settings.JWT_SECRET_KEY)
             serializer = RegistrationSerializer(user)
-            data = {'user': serializer.data, 'token': auth_token}
+            data = {
+                'success':True,
+                'user': serializer.data,
+                'token': auth_token
+            }
             return Response(data, status=status.HTTP_200_OK)
 
-        return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'success':False, 'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 

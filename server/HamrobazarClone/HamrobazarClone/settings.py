@@ -31,7 +31,8 @@ INSTALLED_APPS = [
     'rest_framework', 
 
     # Custom apps
-    'Accounts.apps.AccountsConfig'
+    'Accounts.apps.AccountsConfig',
+    'Products.apps.ProductsConfig',
 ]
 
 REST_FRAMEWORK = {
@@ -69,6 +70,8 @@ TEMPLATES = [
         },
     },
 ]
+
+AUTH_USER_MODEL = 'Accounts.Account'
 
 WSGI_APPLICATION = 'HamrobazarClone.wsgi.application'
 

@@ -33,3 +33,22 @@ def add_product(request):
       return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
 
+@api_view(['DELETE', ])
+@permission_classes((IsAuthenticated,))
+def api_delete_post_view(request, pk):
+    try:
+        post = Product.objects.get(pk=pk)
+    except Product.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    data = {}
+    user = request.user
+    if post.user.user != user:
+        return Response({'response': 'You dont have permission to delete this product.'})
+    if request.method == 'DELETE':
+        operation = post.delete()
+        if operation:
+            data['success'] = 'Deleted Successfully'
+        else:
+            data['failure'] = 'Delete failed'
+        return Response(data=data)

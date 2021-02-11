@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     # Custom apps
     'Accounts.apps.AccountsConfig',
     'Products.apps.ProductsConfig',
+    'Category.apps.CategoryConfig',
 ]
 
 REST_FRAMEWORK = {

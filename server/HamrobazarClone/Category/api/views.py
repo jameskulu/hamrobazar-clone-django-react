@@ -1,6 +1,5 @@
-from django.shortcuts import render
-from .serializer import ProductSerializer
-from ..models import Product
+from .serializer import CategorySerializer
+from ..models import Category
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
@@ -8,34 +7,33 @@ from rest_framework.permissions import IsAuthenticated
 
 
 @api_view(['GET', ])
-def api_products_view(request):
+def api_caregories_view(request):
   try:
-      posts = Product.objects.all()
-  except Product.DoesNotExist:
+      catogories = Category.objects.all()
+  except Category.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
 
-  serializer = ProductSerializer(posts,many=True)
+  serializer = CategorySerializer(catogories,many=True)
   return Response(serializer.data)
 
 
 @api_view(['GET', ])
-def api_single_product_view(request,pk):
+def api_single_category_view(request,pk):
   try:
-      post = Product.objects.get(pk=pk)
-  except Product.DoesNotExist:
+      category = Category.objects.get(pk=pk)
+  except Category.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
 
-  serializer = ProductSerializer(post)
+  serializer = CategorySerializer(category)
   return Response(serializer.data)
 
 
 @api_view(['POST',])
 @permission_classes((IsAuthenticated,))
-def api_add_product_view(request):
+def api_add_category_view(request):
   user = request.user
-  product = Product(user=user)
   if request.method == 'POST':
-      serializer = ProductSerializer(product, data=request.data)
+      serializer = CategorySerializer(data=request.data)
       data = {}
       if serializer.is_valid():
           serializer.save()
@@ -45,18 +43,18 @@ def api_add_product_view(request):
 
 @api_view(['PUT', ])
 @permission_classes((IsAuthenticated,))
-def api_update_product_view(request, pk):
+def api_update_category_view(request, pk):
     try:
-        product = Product.objects.get(pk=pk)
-    except Product.DoesNotExist:
+        category = Category.objects.get(pk=pk)
+    except Category.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     user = request.user
 
-    if product.user != user:
-        return Response({'response': 'You dont have permission to edit this product.'})
+    if category.user != user:
+        return Response({'response': 'You dont have permission to edit this category.'})
 
-    serializer = ProductSerializer(product, data=request.data,partial=True)
+    serializer = CategorySerializer(category, data=request.data,partial=True)
     data = {}
     if serializer.is_valid():
           serializer.save()
@@ -64,23 +62,26 @@ def api_update_product_view(request, pk):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+
 @api_view(['DELETE', ])
 @permission_classes((IsAuthenticated,))
-def api_delete_product_view(request, pk):
+def api_delete_category_view(request, pk):
     try:
-        product = Product.objects.get(pk=pk)
-    except Product.DoesNotExist:
+        category = Category.objects.get(pk=pk)
+    except Category.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     data = {}
     user = request.user
-    if product.user != user:
-        return Response({'response': 'You dont have permission to delete this product.'})
+    if category.user != user:
+        return Response({'response': 'You dont have permission to delete this category.'})
    
-    operation = product.delete()
+    operation = category.delete()
     if operation:
         data['success'] = 'Deleted Successfully'
     else:
         data['failure'] = 'Delete failed'
     return Response(data=data)
+
 

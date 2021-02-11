@@ -20,11 +20,13 @@ def api_register_user_view(request):
         data = {}
         if serializer.is_valid():
             account = serializer.save()
-            data['success'] = True
-            data['user_id'] = account.id
-            data['email'] = account.email
+            # data['id'] = account.id
+            # data['email'] = account.email
+            data['user'] = {
+                'id':account.id,
+                'email':account.email
+            }
         else:
-            data['success'] = False
             data['details'] = serializer.errors
         return Response(data)
 
@@ -42,20 +44,10 @@ class LoginView(GenericAPIView):
                 {'id': user.id}, settings.JWT_SECRET_KEY)
             serializer = RegistrationSerializer(user)
             data = {
-                'success':True,
                 'user': serializer.data,
                 'token': auth_token
             }
             return Response(data, status=status.HTTP_200_OK)
 
-        return Response({'success':False, 'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'details': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
-
-
-@api_view(['GET', ])
-@permission_classes((IsAuthenticated,))
-def index(request):
-    return JsonResponse({
-        "title": "My world",
-        "body": "hello my friend"
-    })

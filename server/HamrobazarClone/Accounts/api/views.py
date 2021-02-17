@@ -13,22 +13,40 @@ from Accounts.api.serializer import  LoginSerializer,RegistrationSerializer
 from ..models import Account
 
 
-@api_view(['POST', ])
-def api_register_user_view(request):
-    if request.method == 'POST':
+# @api_view(['POST', ])
+# def api_register_user_view(request):
+#     serializer = RegistrationSerializer()
+#     if request.method == 'POST':
+#         serializer = RegistrationSerializer(data=request.data)
+#         data = {}
+#         if serializer.is_valid():
+#             account = serializer.save()
+
+#             data['success'] = True
+#             data['user'] = {
+#                 'id':account.id,
+#                 'email':account.email
+#             }
+#             return Response(data,status = status.HTTP_201_CREATED)
+#         else:
+#             data['success'] = False
+#             data['details'] = serializer.errors
+#             return Response(data,status = status.HTTP_400_BAD_REQUEST)
+
+
+class RegisterView(GenericAPIView):
+    serializer_class = RegistrationSerializer
+
+    def post(self, request):
         serializer = RegistrationSerializer(data=request.data)
         data = {}
         if serializer.is_valid():
-            account = serializer.save()
-            # data['id'] = account.id
-            # data['email'] = account.email
-            data['user'] = {
-                'id':account.id,
-                'email':account.email
+            serializer.save()
+            data = {
+                'user':serializer.data
             }
-        else:
-            data['details'] = serializer.errors
-        return Response(data)
+            return Response(data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginView(GenericAPIView):
@@ -50,4 +68,3 @@ class LoginView(GenericAPIView):
             return Response(data, status=status.HTTP_200_OK)
 
         return Response({'details': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-

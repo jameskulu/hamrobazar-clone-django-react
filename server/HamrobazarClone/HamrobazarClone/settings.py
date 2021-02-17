@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # 3rd party apps
-    'rest_framework', 
+    'rest_framework',
 
     # Custom apps
     'Accounts.apps.AccountsConfig',
@@ -39,7 +39,8 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'Accounts.api.middleware.tokenVerify.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS':'rest_framework.schemas.coreapi.AutoSchema'
 }
 
 MIDDLEWARE = [
